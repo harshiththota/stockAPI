@@ -32,8 +32,8 @@ app.get('/', (req, res) => {
   res.json({ "message": "Called route" });
 });
 
-// Require Notes routes
-require('./app/routes/user.routes.js')(app);
+// Require User routes
+require('./app/routes/trades.routes.js')(app);
 
 // listen for requests
 app.listen(3000, () => {
