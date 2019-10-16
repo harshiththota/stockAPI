@@ -1,5 +1,6 @@
 const Trades = require('../models/trades.model.js');
 const Validators = require('../validators.js');
+const Securities = require('../controllers/securities.controller.js');
 
 const TRADE_TYPE = {
   BUY: 'buy',
@@ -26,7 +27,10 @@ exports.create = (req, res) => {
   // Save Trade in the database
   trade.save()
     .then(data => {
-      res.send(data);
+      Securities.create(data)
+      .then(() => {
+        res.send({ message: "Operation executed successfully"});
+      })
     }).catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating the Trade."

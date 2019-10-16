@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const SecuritiesSchema = mongoose.Schema({
   tickerSymbol: String,
   quantity: Number,
-  averageBuyPrice: Decimal128,
+  averageBuyPrice: mongoose.Schema.Types.Decimal128,
 }, {
   timestamps: true
 });
