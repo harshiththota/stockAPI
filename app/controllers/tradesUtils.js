@@ -1,6 +1,4 @@
 const Trades = require('../models/trades.model.js');
-const SecuritiesUtils = require('./securitiesUtils.js');
-
 
 exports.createTrade = function (trade) {
   // Create a Trade
@@ -8,17 +6,13 @@ exports.createTrade = function (trade) {
     tickerSymbol: trade.tickerSymbol,
     quantity: trade.quantity,
     price: trade.price,
-    type: trade.BUY,
+    type: trade.type,
   });
 
   // Save Trade in the database
   return trade.save()
-    .then(() => {
-        // Update Securitites 
-      return SecuritiesUtils.createOrUpdateSecurities(trade)
-        .then((data) => {
-            return data;
-        })
+    .then((data) => {
+        return data;
     }).catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating the Trade."

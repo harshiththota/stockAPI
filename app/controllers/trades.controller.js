@@ -1,6 +1,6 @@
 const Trades = require('../models/trades.model.js');
 const Validators = require('../validators.js');
-const Securities = require('./securitiesUtils.js');
+const SecuritiesUtils = require('./securitiesUtils.js');
 const TradeUtils = require('./tradesUtils');
 
 const TRADE_TYPE = {
@@ -8,7 +8,7 @@ const TRADE_TYPE = {
   SELL: 'sell',
 }
 
-// Create and Save a new Trade
+// Create a new Trade
 exports.create = (req, res) => {
   // Validate trade
   if (!Validators.isValidTrade(req.body)) {
@@ -24,11 +24,15 @@ exports.create = (req, res) => {
     price: req.body.price,
     type: TRADE_TYPE.BUY,
   };
-
+  
   // Call func to create trade and update security
-  TradeUtils.createTrade(trade)
+  return SecuritiesUtils.createOrUpdateSecurity(trade)
     .then(() => {
-        res.send({ message: "Operation executed successfully"});
+      // Update Securitites 
+      return TradeUtils.createTrade(trade)
+        .then(() => {
+          res.send({ message: "Operation executed successfully" });
+        })
     }).catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating the Trade."
@@ -36,6 +40,7 @@ exports.create = (req, res) => {
     });
 };
 
+// Updates the trade
 exports.update = (req, res) => {
   if (!Validators.isValidTrade(req.body)) {
     return res.status(400).send({
@@ -43,33 +48,23 @@ exports.update = (req, res) => {
     });
   }
 
-  return Securities.updateTrade(req.body)
+  // Create a Trade
+  const trade = {
+    tickerSymbol: req.body.tickerSymbol,
+    quantity: req.body.quantity,
+    price: req.body.price,
+    type: TRADE_TYPE.BUY,
+  };
+
+  return SecuritiesUtils.updateSecurity(trade)
     .then(() => {
-      return exports.updateTrade(req.body)
+      return TradeUtils.createTrade(trade)
         .then(() => {
           res.send({ message: "Operation executed successfully" });
         });
     }).catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating the Trade."
-      });
-    });
-}
-
-exports.deleteTrade = function (newDeleteTrade) {
-  // Create a Trade
-  const trade = new Trades({
-    tickerSymbol: newDeleteTrade.tickerSymbol,
-    quantity: newDeleteTrade.quantity,
-    price: newDeleteTrade.price,
-    type: TRADE_TYPE.SELL,
-  });
-
-  return trade.save()
-    .then(data => data)
-    .catch(err => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while creating the delete Trade."
       });
     });
 };
@@ -82,9 +77,17 @@ exports.delete = (req, res) => {
     });
   }
 
-  return Securities.deleteTrade(req.body)
+  // Create a Trade
+  const trade = {
+    tickerSymbol: req.body.tickerSymbol,
+    quantity: req.body.quantity,
+    price: req.body.price,
+    type: TRADE_TYPE.SELL,
+  };
+
+  return SecuritiesUtils.deleteSecutity(trade)
     .then(() => {
-      return exports.deleteTrade(req.body)
+      return TradeUtils.createTrade(trade)
         .then(() => {
           res.send({ message: "Operation executed successfully" });
         });
@@ -109,7 +112,7 @@ exports.portfolio = (req, res) => {
     .then((trades) => {
       result.trades = trades;
 
-      return Securities.getSecurities()
+      return SecuritiesUtils.getSecurities()
         .then((securities) => {
             result.securities = securities;
 
@@ -123,7 +126,7 @@ exports.portfolio = (req, res) => {
 };
 
 exports.holdings = (req, res) => {
-  return Securities.getSecurities()
+  return SecuritiesUtils.getSecurities()
         .then((securities) => {
           res.send(securities);
         }).catch(err => {
@@ -134,7 +137,7 @@ exports.holdings = (req, res) => {
 };
 
 exports.returns = (req, res) => {
-  return Securities.getReturns()
+  return SecuritiesUtils.getReturns()
     .then((returns) => {
       res.send({ returns: returns });
     }).catch(err => {

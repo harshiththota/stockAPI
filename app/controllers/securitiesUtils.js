@@ -17,7 +17,7 @@ exports.createSecurity = function (trade) {
     });
 };
 
-exports.createOrUpdateSecurities = function (trade) {
+exports.createOrUpdateSecurity = function (trade) {
   return Securities.findOne({ tickerSymbol: trade.tickerSymbol})
     .then((security) => {
         if (!security) {
@@ -36,7 +36,26 @@ exports.createOrUpdateSecurities = function (trade) {
       });
 };
 
-exports.deleteTrade = function (trade) {
+exports.updateSecurity = function (trade) {
+  return Securities.findOne({ tickerSymbol: trade.tickerSymbol })
+    .then((security) => {
+      if (!security) {
+        throw new Error("Cannot update trade with out security");
+      }
+
+      // Updates current security
+      security.averageBuyPrice = ((security.quantity * security.averageBuyPrice)
+        + (trade.quantity * trade.price)) / (security.quantity + trade.quantity);
+      security.quantity = security.quantity + trade.quantity;
+
+      return security.save()
+        .catch(err => {
+          throw new Error(err + "Some error occurred while creating the new Security");
+        });
+    });
+};
+
+exports.deleteSecutity = function (trade) {
   return Securities.findOne({ tickerSymbol: trade.tickerSymbol })
     .then((security) => {
       if (!security) {
