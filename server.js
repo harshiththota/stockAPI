@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 // create express app
 const app = express();
 
+// Set the port
+const port = process.env.PORT || 8080;
+
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -36,6 +39,6 @@ app.get('/', (req, res) => {
 require('./app/routes/trades.routes.js')(app);
 
 // listen for requests
-app.listen(8080, () => {
-  console.log("Server is listening on port 8080");
+app.listen(port, () => {
+  console.log(`Server is listening on port ${port}`);
 });
