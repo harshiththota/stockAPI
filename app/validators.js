@@ -12,8 +12,15 @@ exports.isNumber = function (data) {
 
 // Validates the trade
 exports.isValidTrade = function (trade) {
+  /* 
+    Validators
+    tickerSymbol - Should be string
+    quantity - Should be number
+    price - Should be number
+    Quantity should greater than 0
+   */
   if (exports.isString(trade.tickerSymbol) && exports.isNumber(trade.quantity)
-    && exports.isNumber(trade.price)) {
+    && exports.isNumber(trade.price) && trade.quantity > 0) {
     return true;
   }
 
