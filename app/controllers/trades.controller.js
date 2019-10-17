@@ -38,6 +38,45 @@ exports.create = (req, res) => {
     });
 };
 
+exports.deleteTrade = function (newDeleteTrade) {
+  // Create a Trade
+  const trade = new Trades({
+    tickerSymbol: newDeleteTrade.tickerSymbol,
+    quantity: newDeleteTrade.quantity,
+    price: newDeleteTrade.price,
+    type: TRADE_TYPE.SELL,
+  });
+
+  return trade.save()
+    .then(data => data)
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while creating the delete Trade."
+      });
+    });
+};
+
+exports.delete = (req, res) => {
+  // Validate trade
+  if (!Validators.isValidTrade(req.body)) {
+    return res.status(400).send({
+      message: "Invalid trade parameters"
+    });
+  }
+
+  return Securities.deleteTrade(req.body)
+    .then(() => {
+      exports.deleteTrade(req.body)
+        .then(() => {
+          res.send({ message: "Operation executed successfully" });
+        });
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while creating the Trade."
+      });
+    });
+};
+
 // Return all trades
 exports.getTrades = function () {
   return Trades.find()

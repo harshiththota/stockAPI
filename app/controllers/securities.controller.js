@@ -27,8 +27,27 @@ exports.create = function (trade) {
         .catch(err => {
           throw new Error(err + "Some error occurred while creating the new Security");
         });
-    })
+    });
+};
 
+exports.deleteTrade = function (trade) {
+  return Securities.findOne({ tickerSymbol: trade.tickerSymbol })
+    .then((security) => {
+      if (!security) {
+        throw new Error("Security not found in your portfolio");
+      }
+
+      if (security.quantity < trade.quantity) {
+        throw new Error("Trade quantity is more than the security quantity");
+      }
+
+      security.quantity = (security.quantity - trade.quantity);
+      
+      return security.save()
+        .catch(err => {
+          throw new Error(err + "Some error occurred while creating the new Security");
+        });
+    })
 };
 
 // Returns all securities

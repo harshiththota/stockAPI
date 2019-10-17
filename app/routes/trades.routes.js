@@ -4,6 +4,9 @@ module.exports = (app) => {
   // Create a new trade
   app.post('/trade', trades.create);
 
+  // Remove a trade
+  app.delete('/trade/', trades.delete);
+
   // fetch portfolio
   app.get('/portfolio', trades.portfolio);
 
