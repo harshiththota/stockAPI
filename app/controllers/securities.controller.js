@@ -50,9 +50,9 @@ exports.deleteTrade = function (trade) {
     })
 };
 
-// Returns all securities
+// Returns all securities which quantity greaterthan 0
 exports.getSecurities = function () {
-  return Securities.find()
+  return Securities.find({ quantity: { $gt: 0 }})
     .then(securities => securities);
 };
 
