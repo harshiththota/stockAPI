@@ -3,4 +3,7 @@ module.exports = (app) => {
 
   // Create a new trade
   app.post('/trade', trades.create);
+
+  // fetch portfolio
+  app.get('/portfolio', trades.portfolio);
 }

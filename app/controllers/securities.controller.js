@@ -27,4 +27,10 @@ exports.create = function (trade) {
         });
     })
 
-}
+};
+
+// Returns all securities
+exports.getSecurities = function () {
+  return Securities.find()
+    .then(securities => securities);
+};

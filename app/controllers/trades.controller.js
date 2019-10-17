@@ -36,5 +36,32 @@ exports.create = (req, res) => {
         message: err.message || "Some error occurred while creating the Trade."
       });
     });
-
 };
+
+// Return all trades
+exports.getTrades = function () {
+  return Trades.find()
+    .then(trades => trades);
+};
+
+// Returns the portfolio data
+exports.portfolio = (req, res) => {
+  const result = {};
+
+  return exports.getTrades()
+    .then((trades) => {
+      result.trades = trades;
+
+      return Securities.getSecurities()
+        .then((securities) => {
+            result.securities = securities;
+
+          res.send(result);
+        });
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while fetching the Portfolio."
+      });
+    });
+
+}
