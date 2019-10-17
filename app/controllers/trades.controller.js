@@ -1,6 +1,7 @@
 const Trades = require('../models/trades.model.js');
 const Validators = require('../validators.js');
-const Securities = require('../controllers/securities.controller.js');
+const Securities = require('./securitiesUtils.js');
+const TradeUtils = require('./tradesUtils');
 
 const TRADE_TYPE = {
   BUY: 'buy',
@@ -17,26 +18,43 @@ exports.create = (req, res) => {
   }
 
   // Create a Trade
-  const trade = new Trades({
+  const trade  = {
     tickerSymbol: req.body.tickerSymbol,
     quantity: req.body.quantity,
     price: req.body.price,
     type: TRADE_TYPE.BUY,
-  });
+  };
 
-  // Save Trade in the database
-  trade.save()
-    .then(data => {
-      Securities.create(data)
-      .then(() => {
+  // Call func to create trade and update security
+  TradeUtils.createTrade(trade)
+    .then(() => {
         res.send({ message: "Operation executed successfully"});
-      })
     }).catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating the Trade."
       });
     });
 };
+
+exports.update = (req, res) => {
+  if (!Validators.isValidTrade(req.body)) {
+    return res.status(400).send({
+      message: "Invalid trade parameters"
+    });
+  }
+
+  return Securities.updateTrade(req.body)
+    .then(() => {
+      return exports.updateTrade(req.body)
+        .then(() => {
+          res.send({ message: "Operation executed successfully" });
+        });
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while creating the Trade."
+      });
+    });
+}
 
 exports.deleteTrade = function (newDeleteTrade) {
   // Create a Trade
@@ -66,7 +84,7 @@ exports.delete = (req, res) => {
 
   return Securities.deleteTrade(req.body)
     .then(() => {
-      exports.deleteTrade(req.body)
+      return exports.deleteTrade(req.body)
         .then(() => {
           res.send({ message: "Operation executed successfully" });
         });

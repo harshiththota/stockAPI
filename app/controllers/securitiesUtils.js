@@ -3,31 +3,37 @@ const _ = require('lodash');
 
 const CURRENT_PRICE = 100;
 
-exports.create = function (trade) {
+// Create new Security
+exports.createSecurity = function (trade) {
+  const newSecurity = new Securities({
+    tickerSymbol: trade.tickerSymbol,
+    quantity: trade.quantity,
+    averageBuyPrice: trade.price
+  });
+
+  return newSecurity.save()
+    .catch(err => {
+      throw new Error(err + "Some error occurred while creating the new Security");
+    });
+};
+
+exports.createOrUpdateSecurities = function (trade) {
   return Securities.findOne({ tickerSymbol: trade.tickerSymbol})
     .then((security) => {
         if (!security) {
-          const newSecurity = new Securities ({
-            tickerSymbol: trade.tickerSymbol,
-            quantity: trade.quantity,
-            averageBuyPrice: trade.price
-          });
-
-          return newSecurity.save()
-            .catch(err => {
-              throw new Error(err + "Some error occurred while creating the new Security");
-            });
+          return exports.createSecurity(trade);
         }
 
+        // Updates current security
         security.averageBuyPrice = ((security.quantity * security.averageBuyPrice)
           + (trade.quantity * trade.price)) / (security.quantity + trade.quantity);
         security.quantity = security.quantity + trade.quantity;
 
-      return security.save()
-        .catch(err => {
-          throw new Error(err + "Some error occurred while creating the new Security");
-        });
-    });
+        return security.save()
+          .catch(err => {
+            throw new Error(err + "Some error occurred while creating the new Security");
+          });
+      });
 };
 
 exports.deleteTrade = function (trade) {
@@ -47,7 +53,7 @@ exports.deleteTrade = function (trade) {
         .catch(err => {
           throw new Error(err + "Some error occurred while creating the new Security");
         });
-    })
+    });
 };
 
 // Returns all securities which quantity greaterthan 0
