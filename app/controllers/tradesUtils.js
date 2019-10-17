@@ -2,7 +2,7 @@ const Trades = require('../models/trades.model.js');
 
 exports.createTrade = function (trade) {
   // Create a Trade
-  const trade = new Trades({
+  const newTrade = new Trades({
     tickerSymbol: trade.tickerSymbol,
     quantity: trade.quantity,
     price: trade.price,
@@ -10,7 +10,7 @@ exports.createTrade = function (trade) {
   });
 
   // Save Trade in the database
-  return trade.save()
+  return newTrade.save()
     .then((data) => {
         return data;
     }).catch(err => {
