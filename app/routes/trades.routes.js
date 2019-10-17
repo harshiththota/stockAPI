@@ -9,4 +9,7 @@ module.exports = (app) => {
 
   // fetch holdings
   app.get('/holdings', trades.holdings);
+
+  // fetch returns
+  app.get('/returns', trades.returns);
 };

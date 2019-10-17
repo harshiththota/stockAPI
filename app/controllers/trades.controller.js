@@ -75,3 +75,14 @@ exports.holdings = (req, res) => {
       });
     });
 };
+
+exports.returns = (req, res) => {
+  return Securities.getReturns()
+    .then((returns) => {
+      res.send({ returns: returns });
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while fetching the Returns."
+      });
+    });
+};
