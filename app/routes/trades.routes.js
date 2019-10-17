@@ -6,4 +6,7 @@ module.exports = (app) => {
 
   // fetch portfolio
   app.get('/portfolio', trades.portfolio);
-}
+
+  // fetch holdings
+  app.get('/holdings', trades.holdings);
+};

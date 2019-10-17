@@ -63,5 +63,15 @@ exports.portfolio = (req, res) => {
         message: err.message || "Some error occurred while fetching the Portfolio."
       });
     });
+};
 
-}
+exports.holdings = (req, res) => {
+  return Securities.getSecurities()
+        .then((securities) => {
+          res.send(securities);
+        }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while fetching the Holdings."
+      });
+    });
+};
